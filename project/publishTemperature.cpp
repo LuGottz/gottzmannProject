@@ -16,7 +16,7 @@ using namespace std;
 #define CLIENTID "Beagle1"
 #define TOPIC "Lugottz/feeds/project.temperature"
 #define AUTHMETHOD "Lugottz"
-#define AUTHTOKEN "aio_jnbH07pdk8lyYs59a0aoDgf4JJPR"
+#define AUTHTOKEN ""
 #define QOS 1
 #define TIMEOUT 10000L
 

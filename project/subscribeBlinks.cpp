@@ -17,7 +17,7 @@ using namespace std;
 #define CLIENTID "Beagle2"
 #define TOPIC "Lugottz/feeds/project.led-blinks"
 #define AUTHMETHOD "Lugottz"
-#define AUTHTOKEN "aio_jnbH07pdk8lyYs59a0aoDgf4JJPR"
+#define AUTHTOKEN ""
 #define QOS 1
 #define TIMEOUT 10000L
 #define THRESHOLD 30
