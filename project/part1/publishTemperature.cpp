@@ -1,8 +1,9 @@
-/** File name: publish.cpp
+/** File name: publishTemperature.cpp
 *   Class for Adafruit IO usage on BB
 *   Original code by Derek Molloy
 *   Modified by Luke Gottzmann for CPE 422
 */
+
 #include <iostream>
 #include <sstream>
 #include <fstream>

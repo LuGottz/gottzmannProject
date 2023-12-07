@@ -1,4 +1,4 @@
-/** File name: subscribe.cpp
+/** File name: subscribeTemperature.cpp
 *   Class for Adafruit IO usage on BB
 *   Original code by Derek Molloy
 *   Modified by Luke Gottzmann for CPE 422
