@@ -4,9 +4,9 @@ config-pin p8.16 gpio_pu
 echo "Configuring pin P9.12 as an input"
 config-pin p9.12 gpio
 echo "Building the transmit/recieveTemperature applications"
-g++ transmitTemperature.cpp GPIO.h -o transmitTemperature -pthread -lpaho-mqtt3c
-g++ recieveTemperature.cpp GPIO.h -o recieveTemperature -pthread -lpaho-mqtt3c
+g++ transmitTemperature.cpp -o transmitTemperature -lpaho-mqtt3c
+g++ recieveTemperature.cpp AnalogIn.cpp -o recieveTemperature -lpaho-mqtt3c
 echo "Building the transmit/recieveLED applications"
-g++ transmitLED.cpp AnalogIn.h -o transmitLED -lpaho-mqtt3c
-g++ recieveLED.cpp AnalogIn.h -o recieveLED -lpaho-mqtt3c
+g++ transmitLED.cpp GPIO.cpp -o transmitLED -pthread -lpaho-mqtt3c
+g++ recieveLED.cpp GPIO.cpp -o recieveLED -pthread -lpaho-mqtt3c
 echo "Finished"

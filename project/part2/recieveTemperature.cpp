@@ -29,18 +29,18 @@ float getTemperature(int adc_value) { // from the TMP36 datasheet
 int main(int argc, char* argv[]) {
    AnalogIn AIN0In(0);
    char str_payload[100];          // Set your max message size here
-   MQTTClient readTemp;
+   MQTTClient client;
    cout << "Starting Beagle board MQTT Adafruit Publish for CPE 422 Project 1" << endl;
    MQTTClient_connectOptions opts = MQTTClient_connectOptions_initializer;
    MQTTClient_message pubmsg = MQTTClient_message_initializer;
    MQTTClient_deliveryToken token;
-   MQTTClient_create(&readTemp, ADDRESS, CLIENTID, MQTTCLIENT_PERSISTENCE_NONE, NULL);
+   MQTTClient_create(&client, ADDRESS, CLIENTID, MQTTCLIENT_PERSISTENCE_NONE, NULL);
    opts.keepAliveInterval = 20;
    opts.cleansession = 1;
    opts.username = AUTHMETHOD;
    opts.password = AUTHTOKEN;
    int rc;
-   if ((rc = MQTTClient_connect(readTemp, &opts)) != MQTTCLIENT_SUCCESS) {
+   if ((rc = MQTTClient_connect(client, &opts)) != MQTTCLIENT_SUCCESS) {
       cout << "Failed to connect, return code " << rc << endl;
       return -1;
    }
@@ -49,11 +49,11 @@ int main(int argc, char* argv[]) {
    pubmsg.payloadlen = strlen(str_payload);
    pubmsg.qos = QOS;
    pubmsg.retained = 0;
-   MQTTClient_publishMessage(readTemp, TOPIC, &pubmsg, &token);
+   MQTTClient_publishMessage(client, TOPIC, &pubmsg, &token);
    cout << "Waiting for up to " << (int)(TIMEOUT/1000) <<
         " seconds for publication of " << str_payload <<
         " \non topic " << TOPIC << " for ClientID: " << CLIENTID << endl;
-   rc = MQTTClient_waitForCompletion(readTemp, token, TIMEOUT);
+   rc = MQTTClient_waitForCompletion(client, token, TIMEOUT);
    if(rc == MQTTCLIENT_SUCCESS) {
      cout << "Message with token " << (int)token << " delivered." << endl;
    }
@@ -65,7 +65,7 @@ int main(int argc, char* argv[]) {
      // MQTTCLIENT_TOPICNAME_TRUNCATED -7   MQTTCLIENT_BAD_STRUCTURE -8
      // MQTTCLIENT_BAD_QOS   -9        MQTTCLIENT_SSL_NOT_SUPPORTED   -10
    }
-   MQTTClient_disconnect(readTemp, 10000);
-   MQTTClient_destroy(&readTemp);
+   MQTTClient_disconnect(client, 10000);
+   MQTTClient_destroy(&client);
    return rc;
 }
