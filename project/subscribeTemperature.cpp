@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "MQTTClient.h"
-#include "derek_ledLED.h"
+#include "derek_LED.h"
 using namespace std;
 
 #define ADDRESS "tcp://io.adafruit.com:1883"
@@ -34,8 +34,8 @@ int msgarrvd(void *context, char *topicName, int topicLen, MQTTClient_message *m
     int i;
     char *payloadptr;
     printf("Message arrived\n");
-    printf("	topic: %s\n", topicName);
-    printf("	message: ");
+    printf("    topic: %s\n", topicName);
+    printf("    message: ");
     payloadptr = (char *)message->payload;
     float temperature = atof(payloadptr);
     printf("The temperature is %f\n", temperature);
@@ -46,7 +46,7 @@ int msgarrvd(void *context, char *topicName, int topicLen, MQTTClient_message *m
     else {
         USR0.turnOff();
     }
-    
+
     MQTTClient_freeMessage(&message);
     MQTTClient_free(topicName);
     return 1;
@@ -54,7 +54,7 @@ int msgarrvd(void *context, char *topicName, int topicLen, MQTTClient_message *m
 
 void connlost(void *context, char *cause) {
     printf("\nConnection lost\n");
-    printf("	cause: %s\n", cause);
+    printf("    cause: %s\n", cause);
 }
 
 int main(int argc, char *argv[]) {
@@ -75,12 +75,10 @@ int main(int argc, char *argv[]) {
         exit(-1);
     }
 
-    printf("Subscribing to topic %s\n and %s for client %s using QoS%d\n\n"
+    printf("Subscribing to topic %s\n for client %s using QoS%d\n\n"
            "Press Q<Enter> to quit\n\n",
-           TOPICTEMP, TOPICBLINK, CLIENTID, QOS);
-    MQTTClient_subscribe(client, TOPICBLINK, QOS);
-    MQTTClient_subscribe(client, TOPICTEMP, QOS);
-    MQTTClient_subscribe(client, TOPICTOGGLE, QOS);
+           TOPIC, CLIENTID, QOS);
+    MQTTClient_subscribe(client, TOPIC, QOS);
 
     do {
         ch = getchar();

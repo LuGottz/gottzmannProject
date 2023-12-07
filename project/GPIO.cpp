@@ -24,28 +24,28 @@ namespace exploringBB {
  * @param number The GPIO number for the BBB
  */
 GPIO::GPIO(int number) {
-	this->number = number;
-	this->debounceTime = 0;
-	this->togglePeriod=100;
-	this->toggleNumber=-1; //infinite number
-	this->callbackFunction = NULL;
-	this->threadRunning = false;
+        this->number = number;
+        this->debounceTime = 0;
+        this->togglePeriod=100;
+        this->toggleNumber=-1; //infinite number
+        this->callbackFunction = NULL;
+        this->threadRunning = false;
 
-	ostringstream s;
-	s << "gpio" << number;
-	this->name = string(s.str());
-	this->path = GPIO_PATH + this->name + "/";
-	//this->exportGPIO();
-	// need to give Linux time to set up the sysfs structure
-	usleep(250000); // 250ms delay
+        ostringstream s;
+        s << "gpio" << number;
+        this->name = string(s.str());
+        this->path = GPIO_PATH + this->name + "/";
+        //this->exportGPIO();
+        // need to give Linux time to set up the sysfs structure
+        usleep(250000); // 250ms delay
 }
 
 int GPIO::write(string path, string filename, string value) {
    ofstream fs;
    fs.open((path + filename).c_str());
    if (!fs.is_open()){
-	   perror("GPIO: write failed to open file ");
-	   return -1;
+           perror("GPIO: write failed to open file ");
+           return -1;
    }
    fs << value;
    fs.close();
@@ -56,7 +56,7 @@ string GPIO::read(string path, string filename) {
    ifstream fs;
    fs.open((path + filename).c_str());
    if (!fs.is_open()){
-	   perror("GPIO: read failed to open file ");
+           perror("GPIO: read failed to open file ");
     }
    string input;
    getline(fs,input);
@@ -122,86 +122,92 @@ int GPIO::setActiveHigh() {
 }
 
 GPIO_VALUE GPIO::getValue() {
-	string input = this->read(this->path, "value");
-	if (input == "0") return LOW;
-	else return HIGH;
+        string input = this->read(this->path, "value");
+        if (input == "0") return LOW;
+        else return HIGH;
+}
+
+GPIO_VALUE GPIO::getValue() {
+        string input = this->read(this->path, "value");
+        if (input == "0") return LOW;
+        else return HIGH;
 }
 
 GPIO_DIRECTION GPIO::getDirection() {
-	string input = this->read(this->path, "direction");
-	if (input == "in") return INPUT;
-	else return OUTPUT;
+        string input = this->read(this->path, "direction");
+        if (input == "in") return INPUT;
+        else return OUTPUT;
 }
 
 GPIO_EDGE GPIO::getEdgeType() {
-	string input = this->read(this->path, "edge");
-	if (input == "rising") return RISING;
-	else if (input == "falling") return FALLING;
-	else if (input == "both") return BOTH;
-	else return NONE;
+        string input = this->read(this->path, "edge");
+        if (input == "rising") return RISING;
+        else if (input == "falling") return FALLING;
+        else if (input == "both") return BOTH;
+        else return NONE;
 }
 
 int GPIO::streamOpen() {
-	stream.open((path + "value").c_str());
-	return 0;
+        stream.open((path + "value").c_str());
+        return 0;
 }
 int GPIO::streamWrite(GPIO_VALUE value) {
-	stream << value << std::flush;
-	return 0;
+        stream << value << std::flush;
+        return 0;
 }
 int GPIO::streamClose() {
-	stream.close();
-	return 0;
+        stream.close();
+        return 0;
 }
 
 int GPIO::toggleOutput() {
-	this->setDirection(OUTPUT);
-	if ((bool) this->getValue()) this->setValue(LOW);
-	else this->setValue(HIGH);
+        this->setDirection(OUTPUT);
+        if ((bool) this->getValue()) this->setValue(LOW);
+        else this->setValue(HIGH);
     return 0;
 }
 
-int GPIO::toggleOutput(int time) { 
-	return this->toggleOutput(-1, time);
+int GPIO::toggleOutput(int time) {
+        return this->toggleOutput(-1, time);
 }
 
 int GPIO::toggleOutput(int numberOfTimes, int time) {
-	this->setDirection(OUTPUT);
-	this->toggleNumber = numberOfTimes;
-	this->togglePeriod = time;
-	this->threadRunning = true;
+        this->setDirection(OUTPUT);
+        this->toggleNumber = numberOfTimes;
+        this->togglePeriod = time;
+        this->threadRunning = true;
     if(pthread_create(&this->thread, NULL, &threadedToggle, static_cast<void*>(this))){
-    	perror("GPIO: Failed to create the toggle thread");
-    	this->threadRunning = false;
-    	return -1;
+        perror("GPIO: Failed to create the toggle thread");
+        this->threadRunning = false;
+        return -1;
     }
     return 0;
 }
 
 // This thread function is a friend function of the class
 void* threadedToggle(void *value) {
-	GPIO *gpio = static_cast<GPIO*>(value);
-	bool isHigh = (bool) gpio->getValue(); //find current value
-	while(gpio->threadRunning){
-		if (isHigh)	gpio->setValue(HIGH);
-		else gpio->setValue(LOW);
-		usleep(gpio->togglePeriod * 500);
-		isHigh=!isHigh;
-		if(gpio->toggleNumber>0) gpio->toggleNumber--;
-		if(gpio->toggleNumber==0) gpio->threadRunning=false;
-	}
-	return 0;
+        GPIO *gpio = static_cast<GPIO*>(value);
+        bool isHigh = (bool) gpio->getValue(); //find current value
+        while(gpio->threadRunning){
+                if (isHigh)     gpio->setValue(HIGH);
+                else gpio->setValue(LOW);
+                usleep(gpio->togglePeriod * 500);
+                isHigh=!isHigh;
+                if(gpio->toggleNumber>0) gpio->toggleNumber--;
+                if(gpio->toggleNumber==0) gpio->threadRunning=false;
+        }
+        return 0;
 }
 
 // Blocking Poll - based on the epoll socket code in the epoll man page
 int GPIO::waitForEdge() {
-	this->setDirection(INPUT); // must be an input pin to poll its value
-	int fd, i, epollfd, count=0;
-	struct epoll_event ev;
-	epollfd = epoll_create(1);
+        this->setDirection(INPUT); // must be an input pin to poll its value
+        int fd, i, epollfd, count=0;
+        struct epoll_event ev;
+        epollfd = epoll_create(1);
     if (epollfd == -1) {
-	   perror("GPIO: Failed to create epollfd");
-	   return -1;
+           perror("GPIO: Failed to create epollfd");
+           return -1;
     }
     if ((fd = open((this->path + "value").c_str(), O_RDONLY | O_NONBLOCK)) == -1) {
        perror("GPIO: Failed to open file");
@@ -217,45 +223,45 @@ int GPIO::waitForEdge() {
        perror("GPIO: Failed to add control interface");
        return -1;
     }
-	while(count<=1){  // ignore the first trigger
-		i = epoll_wait(epollfd, &ev, 1, -1);
-		if (i==-1){
-			perror("GPIO: Poll Wait fail");
-			count=5; // terminate loop
-		}
-		else {
-			count++; // count the triggers up
-		}
-	}
+        while(count<=1){  // ignore the first trigger
+                i = epoll_wait(epollfd, &ev, 1, -1);
+                if (i==-1){
+                        perror("GPIO: Poll Wait fail");
+                        count=5; // terminate loop
+                }
+                else {
+                        count++; // count the triggers up
+                }
+        }
     close(fd);
     if (count==5) return -1;
-	return 0;
+        return 0;
 }
 
 // This thread function is a friend function of the class
 void* threadedPoll(void *value) {
-	GPIO *gpio = static_cast<GPIO*>(value);
-	while(gpio->threadRunning){
-		gpio->callbackFunction(gpio->waitForEdge());
-		usleep(gpio->debounceTime * 1000);
-	}
-	return 0;
+        GPIO *gpio = static_cast<GPIO*>(value);
+        while(gpio->threadRunning){
+                gpio->callbackFunction(gpio->waitForEdge());
+                usleep(gpio->debounceTime * 1000);
+        }
+        return 0;
 }
 
 int GPIO::waitForEdge(CallbackType callback) {
-	this->threadRunning = true;
-	this->callbackFunction = callback;
+        this->threadRunning = true;
+        this->callbackFunction = callback;
     // create the thread, pass the reference, address of the function and data
     if(pthread_create(&this->thread, NULL, &threadedPoll, static_cast<void*>(this))){
-    	perror("GPIO: Failed to create the poll thread");
-    	this->threadRunning = false;
-    	return -1;
+        perror("GPIO: Failed to create the poll thread");
+        this->threadRunning = false;
+        return -1;
     }
     return 0;
 }
 
 GPIO::~GPIO() {
-//	this->unexportGPIO();
+//      this->unexportGPIO();
 }
 
 } /* namespace exploringBB */

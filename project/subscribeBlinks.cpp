@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "MQTTClient.h"
-#include "derek_ledLED.h"
+#include "derek_LED.h"
 using namespace std;
 
 #define ADDRESS "tcp://io.adafruit.com:1883"
@@ -32,7 +32,7 @@ void delivered(void *context, MQTTClient_deliveryToken dt)
 
 int msgarrvd(void *context, char *topicName, int topicLen, MQTTClient_message *message)
 {
-    LED USR3 = LED(3); 
+    LED USR3 = LED(3);
     int i;
     char *payloadptr;
     printf("Message arrived\n");
@@ -79,7 +79,6 @@ int main(int argc, char *argv[])
            "Press Q<Enter> to quit\n\n",
            TOPIC, CLIENTID, QOS);
     MQTTClient_subscribe(client, TOPIC, QOS);
-
 
     do
     {

@@ -4,14 +4,14 @@
 */
 
 class AnalogIn {
-	private:
-		unsigned int number;
-	public:
-		AnalogIn();
-		AnalogIn(unsigned int n);
-		virtual unsigned int getNumber() { return number; }
-		virtual void setNumber(unsigned int n);
-		virtual int readAdc();
-		virtual float Adc2Volt(int Adc, float Vref);
-		virtual ~AnalogIn();
+        private:
+                unsigned int number;
+        public:
+                AnalogIn();
+                AnalogIn(unsigned int n);
+                virtual unsigned int getNumber() { return number; }
+                virtual void setNumber(unsigned int n);
+                virtual int readADC();
+                virtual float ADC2Volt(int ADC, float Vref);
+                virtual ~AnalogIn();
 };

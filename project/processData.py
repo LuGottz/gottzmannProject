@@ -12,34 +12,29 @@ Example Invocation: python3 processData.py file.csv
 import sys
 import csv
 
-file1 = open(sys.argv[1], 'r')  
-reader = csv.reader(file1)  
-headings = next(reader)
-data = []
+with open(sys.argv[1], mode ='r') as file:
+    reader = csv.reader(file)
+    next(reader)
+    data = []
+    for lines in reader:
+        data.append(float(lines[1]))
 
-for l in reader:
-    data.append(float(l[1]))
-    
 print(f"Feed data: {data}")
-file1.close()
+file.close()
 
-minNum = 0
-maxNum = 0
+minNum = data[0]
+maxNum = data[0]
 
-for i in range(len(data)):
-    if i == 0:
-        minNum = i
-        maxNum = i
-        continue
-    if i > maxNum:
-        maxNum = i
-    if i < minNum:
-        minNum = i
-        
+for x in data:
+    if x > maxNum:
+        maxNum = x
+    if x < minNum:
+        minNum = x
+
 dataSum = 0
 
-for i in range(len(data)):
-    dataSum += i
-    
+for y in data:
+    dataSum = dataSum + y
+
 average = dataSum / len(data)
 print(f"Avg: {average} Min: {minNum} Max: {maxNum}")

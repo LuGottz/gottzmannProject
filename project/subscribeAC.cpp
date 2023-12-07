@@ -10,8 +10,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include "MQTTClient.h"
-#include "gpio.h"
+#include "GPIO.h"
 using namespace std;
+using namespace exploringBB;
 
 #define ADDRESS "tcp://io.adafruit.com:1883"
 #define CLIENTID "Beagle2"
@@ -32,15 +33,14 @@ void delivered(void *context, MQTTClient_deliveryToken dt)
 
 int msgarrvd(void *context, char *topicName, int topicLen, MQTTClient_message *message)
 {
-    MYGPIO gpioOutput(60); //p9.12 for toggle
-    gpioOutput.setDirection(OUTPUT); 
+    GPIO gpioOutput(60); // p9.12 toggle
+    gpioOutput.setDirection(OUTPUT);
     int i;
     char *payloadptr;
     printf("Message arrived\n");
     printf("     topic: %s\n", topicName);
     printf("   message: ");
     payloadptr = (char *)message->payload;
-
         float temperature = atof(payloadptr);
         if (strcmp(payloadptr, "ON") == 0)
         {

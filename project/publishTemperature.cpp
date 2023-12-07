@@ -3,15 +3,13 @@
 *   Original code by Derek Molloy
 *   Modified by Luke Gottzmann for CPE 422
 */
-
 #include <iostream>
 #include <sstream>
 #include <fstream>
 #include <string.h>
 #include "MQTTClient.h"
-#include "analogin.h"
+#include "AnalogIn.h"
 using namespace std;
-
 #define ADDRESS "tcp://io.adafruit.com"
 #define CLIENTID "Beagle1"
 #define TOPIC "Lugottz/feeds/project.temperature"
@@ -46,7 +44,7 @@ int main(int argc, char *argv[]) {
       return -1;
    }
 
-   sprintf(str_payload, "%f", getTemperature(analogIn.readADCSample()));
+   sprintf(str_payload, "%f", getTemperature(analogIn.readADC()));
    pubmsg.payload = str_payload;
    pubmsg.payloadlen = strlen(str_payload);
    pubmsg.qos = QOS;
@@ -54,7 +52,6 @@ int main(int argc, char *argv[]) {
    MQTTClient_publishMessage(client, TOPIC, &pubmsg, &token);
    cout << "Waiting for up to " << (int)(TIMEOUT / 1000) << " seconds for publication of " << str_payload << " \non topic " << TOPIC << " for ClientID: " << CLIENTID << endl;
    rc = MQTTClient_waitForCompletion(client, token, TIMEOUT);
-
    if (rc == MQTTCLIENT_SUCCESS) {
       cout << "Message with token " << (int)token << " delivered." << endl;
    }

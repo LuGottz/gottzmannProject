@@ -4,7 +4,7 @@
 *   Modified by Luke Gottzmann for CPE 422
 */
 
-#include "myLED.h"
+#include "derek_LED.h"
 
 LED::LED(int number){
    this->number = number;
@@ -46,25 +46,14 @@ void LED::flash(string delayms = "50"){
 
 void LED::blink(int num) {
    cout << "Making USR3 LED blink " << num << " times for 1 second each." << endl;
+   string delayms = "1000";
    removeTrigger();
    for (int i = 0; i < num; i++) {
       // turn on LED
       writeLED("/brightness", "1");
-      sleep(1);
+      writeLED("/delay_on", delayms);
       // turn off LED
       writeLED("/brightness", "0");
-      sleep(1);
+      writeLED("/delay_off", delayms);
    }
-}
-
-void LED::outputState(){
-   ifstream fs;
-   fs.open( (path + "/trigger").c_str());
-   string line;
-   while(getline(fs,line)) cout << line << endl;
-   fs.close();
-}
-
-LED::~LED(){
-   cout << "destroying the LED with path: " << path << endl;
 }
