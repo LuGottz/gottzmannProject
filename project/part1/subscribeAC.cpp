@@ -1,4 +1,4 @@
-/** File name: transmitTemperature.cpp
+/** File name: subscribeAC.cpp
 *   Class for Adafruit IO usage on BB
 *   Original code by Derek Molloy
 *   Modified by Luke Gottzmann for CPE 422
@@ -10,39 +10,17 @@
 #include <stdlib.h>
 #include <string.h>
 #include "MQTTClient.h"
+#include "GPIO.h"
 using namespace std;
 
-#define ADDRESS     "tcp://io.adafruit.com:1883"
-#define CLIENTID    "Beagle2"
-#define TOPIC       "Lugottz/feeds/project.temperature"
-#define AUTHMETHOD  "Lugottz"
-#define AUTHTOKEN   ""
-#define QOS         1
-#define TIMEOUT     10000L
-//#define LED_GPIO    "/sys/class/gpio/gpio60"
-#define LED_USR    "/sys/class/leds/beaglebone:green:usr0"
-#define THRESHOLD   75
-
-// Use this function to control the LED 
-void writeGPIO(string filename, string value){
-   fstream fs;
-   string path(LED_GPIO);
-   fs.open((path + filename).c_str(), fstream::out);
-   fs << value;
-   fs.close();
-}
-
-void writeLED(string filename, string value){
-   fstream fs;
-   string path(LED_USR);
-   fs.open((path + filename).c_str(), fstream::out);
-   fs << value;
-   fs.close();
-}
-
-void removeTrigger(){
-	writeLED("/trigger", "none");
-}
+#define ADDRESS "tcp://io.adafruit.com:1883"
+#define CLIENTID "Beagle2"
+#define TOPIC "Lugottz/feeds/project.ac-toggle"
+#define AUTHMETHOD "Lugottz"
+#define AUTHTOKEN ""
+#define QOS 1
+#define TIMEOUT 10000L
+#define THRESHOLD 30
 
 volatile MQTTClient_deliveryToken deliveredtoken;
 
@@ -52,32 +30,21 @@ void delivered(void *context, MQTTClient_deliveryToken dt) {
 }
 
 int msgarrvd(void *context, char *topicName, int topicLen, MQTTClient_message *message) {
+    GPIO GPIOOut(60); // pin P9.12 toggle
+    GPIOOut.setDirection(OUTPUT);
     int i;
     char* payloadptr;
     printf("Message arrived\n");
     printf("     topic: %s\n", topicName);
-
-    if (message->payloadlen == 0) {
-        printf("Empty payload\n");
-        return 0;
-   }
-
     printf("   message: ");
     payloadptr = (char*) message->payload;
-    float temperature = atof(payloadptr);
-    printf("The temperature is %f\n", temperature);
-
-  if (temperature > THRESHOLD)	{ 
-	removeTrigger();
-	writeLED("/brightness", "1");
-}	else if(temperature < THRESHOLD){
-	removeTrigger();
-	writeLED("/brightness", "0");
-}	else	{
-	   	cout << "Invalid command!" << endl;
-}    
-
-//temperature > THRESHOLD ? writeGPIO("value", "1") : writeGPIO("value", "0");		    
+    int value = atoi(payloadptr);
+    printf("The toggle is set to %d\n",value);
+    if (value == 1) {
+    	GPIOOut.setValue(HIGH);
+    } else {
+	GPIOOut.setValue(LOW);
+    }
     MQTTClient_freeMessage(&message);
     MQTTClient_free(topicName);
     return 1;
@@ -93,7 +60,6 @@ int main(int argc, char* argv[]) {
     MQTTClient_connectOptions opts = MQTTClient_connectOptions_initializer;
     int rc;
     int ch;
-    writeLED("direction", "out");
 
     MQTTClient_create(&client, ADDRESS, CLIENTID, MQTTCLIENT_PERSISTENCE_NONE, NULL);
     opts.keepAliveInterval = 20;
@@ -108,7 +74,7 @@ int main(int argc, char* argv[]) {
     printf("Subscribing to topic %s\nfor client %s using QoS%d\n\n"
            "Press Q<Enter> to quit\n\n", TOPIC, CLIENTID, QOS);
     MQTTClient_subscribe(client, TOPIC, QOS);
-    
+
     do {
         ch = getchar();
     } while(ch!='Q' && ch != 'q');

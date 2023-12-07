@@ -57,3 +57,15 @@ void LED::blink(int num) {
       writeLED("/delay_off", delayms);
    }
 }
+
+void LED::outputState(){
+   ifstream fs;
+   fs.open( (path + "/trigger").c_str());
+   string line;
+   while(getline(fs,line)) cout << line << endl;
+      fs.close();
+}
+
+LED::~LED(){
+   cout << "destroying the LED with path: " << path << endl;
+}

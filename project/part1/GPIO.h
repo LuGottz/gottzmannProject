@@ -4,16 +4,12 @@
 *   Modified by Luke Gottzmann for CPE 422
 */
 
-#ifndef GPIO_H_
-#define GPIO_H_
 #include<string>
 #include<fstream>
 using std::string;
 using std::ofstream;
 
 #define GPIO_PATH "/sys/class/gpio/"
-
-namespace exploringBB {
 
 typedef int (*CallbackType)(int);
 enum GPIO_DIRECTION{ INPUT, OUTPUT };
@@ -24,6 +20,19 @@ class GPIO {
 private:
         int number, debounceTime;
         string name, path;
+	int write(string path, string filename, string value);
+        int write(string path, string filename, int value);
+        string read(string path, string filename);
+        //int exportGPIO();
+        //int unexportGPIO();
+        ofstream stream;
+        pthread_t thread;
+        CallbackType callbackFunction;
+        bool threadRunning;
+        int togglePeriod;  //default 100ms
+        int toggleNumber;  //default -1 (infinite)
+        friend void* threadedPoll(void *value);
+        friend void* threadedToggle(void *value);
 
 public:
         GPIO(int number); //constructor will export the pin
@@ -58,26 +67,7 @@ public:
         virtual void waitForEdgeCancel() { this->threadRunning = false; }
 
         virtual ~GPIO();  //destructor will unexport the pin
-
-private:
-        int write(string path, string filename, string value);
-        int write(string path, string filename, int value);
-        string read(string path, string filename);
-        //int exportGPIO();
-        //int unexportGPIO();
-        ofstream stream;
-        pthread_t thread;
-        CallbackType callbackFunction;
-        bool threadRunning;
-        int togglePeriod;  //default 100ms
-        int toggleNumber;  //default -1 (infinite)
-        friend void* threadedPoll(void *value);
-        friend void* threadedToggle(void *value);
 };
 
 void* threadedPoll(void *value);
 void* threadedToggle(void *value);
-
-} /* namespace exploringBB */
-
-#endif /* GPIO_H_ */

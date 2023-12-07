@@ -1,42 +1,24 @@
-/** File name: transmitLED.cpp
+/** File name: transmitTemperature.cpp
 *   Class for Adafruit IO usage on BB
 *   Original code by Derek Molloy
 *   Modified by Luke Gottzmann for CPE 422
 */
 
 #include <iostream>
-#include <sstream>
 #include <fstream>
-#include <string.h>
 #include <stdio.h>
-#include <unistd.h>
+#include <stdlib.h>
+#include <string.h>
 #include "MQTTClient.h"
-#include "GPIO.h"
-#include "GPIO.cpp"
 using namespace std;
-using namespace exploringBB;
 
-#define ADDRESS    "tcp://io.adafruit.com"
-#define CLIENTID   "Beagle1"
-#define TOPIC      "Lugottz/feeds/project.crossLED"
-#define AUTHMETHOD "Lugottz"
-#define AUTHTOKEN  ""
-#define QOS        1
-#define TIMEOUT    10000L
-#define GPIO_PIN   60 
-#define LED_GPIO  "/sys/class/gpio/gpio60"
-#define GPIO_PATH "/sys/class/gpio/"
-
-//const std::string  gpioPath = "/sys/class/gpio/gpio46";
-//const std::string  gpioPathValue = "/sys/class/gpio/gpio46/value";
-
-void writeGPIO(string filename, string value){
-   fstream fs;
-   string path(LED_GPIO);
-   fs.open((path + filename).c_str(), fstream::out);
-   fs << value;
-   fs.close();
-}
+#define ADDRESS     "tcp://io.adafruit.com:1883"
+#define CLIENTID    "Beagle2"
+#define TOPIC       "Lugottz/feeds/project.temperature"
+#define AUTHMETHOD  "Lugottz"
+#define AUTHTOKEN   ""
+#define QOS         1
+#define TIMEOUT     10000L
 
 volatile MQTTClient_deliveryToken deliveredtoken;
 
@@ -50,32 +32,10 @@ int msgarrvd(void *context, char *topicName, int topicLen, MQTTClient_message *m
     char* payloadptr;
     printf("Message arrived\n");
     printf("     topic: %s\n", topicName);
-
-    if (message->payloadlen == 0) {
-        printf("Empty payload\n");
-        return 0;
-    }
-	
     printf("   message: ");
     payloadptr = (char*) message->payload;
-    float cross = atof(payloadptr);
-    printf("The Appliances are %f\n", cross);
-
-    if (cross > 0){ 
-	printf("Led ON \n");
-        system("echo 1 > /sys/class/gpio/gpio60/value");
-	
-	//writeGPIO("value", "1");
-
-    }	
-    else {
-	printf("Led OFF \n");
-	
-	system("echo 0 > /sys/class/gpio/gpio60/value");
-
-	//writeGPIO("value", "0");
-    }    
-	    
+    float temperature = atof(payloadptr);
+    printf("The temperature is %f\n", temperature);
     MQTTClient_freeMessage(&message);
     MQTTClient_free(topicName);
     return 1;
@@ -91,8 +51,6 @@ int main(int argc, char* argv[]) {
     MQTTClient_connectOptions opts = MQTTClient_connectOptions_initializer;
     int rc;
     int ch;
-    
-    writeGPIO("direction", "out");
 
     MQTTClient_create(&client, ADDRESS, CLIENTID, MQTTCLIENT_PERSISTENCE_NONE, NULL);
     opts.keepAliveInterval = 20;
@@ -107,7 +65,7 @@ int main(int argc, char* argv[]) {
     printf("Subscribing to topic %s\nfor client %s using QoS%d\n\n"
            "Press Q<Enter> to quit\n\n", TOPIC, CLIENTID, QOS);
     MQTTClient_subscribe(client, TOPIC, QOS);
-    
+
     do {
         ch = getchar();
     } while(ch!='Q' && ch != 'q');

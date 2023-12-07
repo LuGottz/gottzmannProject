@@ -12,6 +12,5 @@ class AnalogIn {
                 virtual unsigned int getNumber() { return number; }
                 virtual void setNumber(unsigned int n);
                 virtual int readADC();
-                virtual float ADC2Volt(int ADC, float Vref);
                 virtual ~AnalogIn();
 };

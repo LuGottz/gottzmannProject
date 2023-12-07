@@ -10,7 +10,7 @@
 using namespace std;
 
 #define ADC_PATH "/sys/bus/iio/devices/iio:device0/in_voltage"
-//#define ADC 0
+#define ADC 0
 
 AnalogIn::AnalogIn() {
 }
@@ -31,12 +31,6 @@ int AnalogIn::readADC() {
         fs >> number;
         fs.close();
         return number;
-}
-float AnalogIn::ADC2Volt(int ADC, float Vref) {
-        // ADC = Vin*1024/Vref
-        float Vin;
-        Vin = (ADC*Vref)/4096;
-        return Vin;
 }
 
 AnalogIn::~AnalogIn() {

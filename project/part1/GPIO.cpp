@@ -4,7 +4,6 @@
 *   Modified by Luke Gottzmann for CPE 422
 */
 
-#include "GPIO.h"
 #include<iostream>
 #include<fstream>
 #include<string>
@@ -15,14 +14,9 @@
 #include<unistd.h>
 #include<sys/epoll.h>
 #include<pthread.h>
+#include "GPIO.h"
 using namespace std;
 
-namespace exploringBB {
-
-/**
- *
- * @param number The GPIO number for the BBB
- */
 GPIO::GPIO(int number) {
         this->number = number;
         this->debounceTime = 0;
@@ -257,5 +251,3 @@ int GPIO::waitForEdge(CallbackType callback) {
 GPIO::~GPIO() {
 //      this->unexportGPIO();
 }
-
-} /* namespace exploringBB */
