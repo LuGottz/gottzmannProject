@@ -127,12 +127,6 @@ GPIO_VALUE GPIO::getValue() {
         else return HIGH;
 }
 
-GPIO_VALUE GPIO::getValue() {
-        string input = this->read(this->path, "value");
-        if (input == "0") return LOW;
-        else return HIGH;
-}
-
 GPIO_DIRECTION GPIO::getDirection() {
         string input = this->read(this->path, "direction");
         if (input == "in") return INPUT;
