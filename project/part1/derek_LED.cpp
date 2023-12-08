@@ -5,6 +5,7 @@
 */
 
 #include "derek_LED.h"
+#include<unistd.h>
 
 LED::LED(int number){
    this->number = number;
@@ -51,10 +52,12 @@ void LED::blink(int num) {
    for (int i = 0; i < num; i++) {
       // turn on LED
       writeLED("/brightness", "1");
-      writeLED("/delay_on", delayms);
+      //writeLED("/delay_on", delayms);
+      sleep(1);
       // turn off LED
       writeLED("/brightness", "0");
-      writeLED("/delay_off", delayms);
+      //writeLED("/delay_off", delayms);
+      sleep(1);
    }
 }
 
